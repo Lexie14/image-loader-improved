@@ -13,6 +13,7 @@ class ImageRender extends Component {
           name="files[]"
           multiple
           onChange={this.props.handleImageLoad}
+          accept="image/*"
         />
         <output>
           <ul id="list" />

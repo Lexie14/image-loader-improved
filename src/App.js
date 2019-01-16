@@ -17,34 +17,14 @@ class App extends Component {
   handleImageLoad(evt) {
     var files = evt.target.files;
 
+    if (files[0].size > 1000000) {
+      alert("The max size of an image must be less than 1Mb!");
+      return;
+    }
+
     let li = document.createElement("li");
     li.id = "li" + files[0].name;
 
-    for (let i = 0, f; (f = files[i]); i++) {
-      if (!f.type.match("image.*")) {
-        continue;
-      }
-
-      let reader = new FileReader();
-
-      reader.onload = (function(theFile) {
-        return function(e) {
-          let span = document.createElement("span");
-          span.innerHTML = [
-            '<img id="',
-            escape(theFile.name),
-            '"src="',
-            e.target.result,
-            '" title="',
-            escape(theFile.name),
-            '"/>'
-          ].join("");
-          li.insertBefore(span, li.childNodes[0]);
-        };
-      })(f);
-
-      reader.readAsDataURL(f);
-    }
     let output = [];
 
     for (let i = 0; i < files.length; i++) {
@@ -68,6 +48,28 @@ class App extends Component {
       liDel.parentNode.removeChild(liDel);
     };
 
+    for (let i = 0, f; (f = files[i]); i++) {
+      let reader = new FileReader();
+
+      reader.onload = (function(theFile) {
+        return function(e) {
+          let span = document.createElement("span");
+          span.innerHTML = [
+            '<img id="',
+            escape(theFile.name),
+            '"src="',
+            e.target.result,
+            '" title="',
+            escape(theFile.name),
+            '"/>'
+          ].join("");
+          li.insertBefore(span, li.childNodes[0]);
+        };
+      })(f);
+
+      reader.readAsDataURL(f);
+    }
+
     btn.appendChild(btnText);
     li.appendChild(btn);
     document.getElementById("list").appendChild(li);
@@ -80,17 +82,26 @@ class App extends Component {
     setTimeout(() => {
       let img1 = document.getElementById(files[0].name);
       EXIF.getData(img1, function() {
-        let longitude = EXIF.getTag(this, "GPSLongitude");
+        var longitude = EXIF.getTag(this, "GPSLongitude");
         let latitude = EXIF.getTag(this, "GPSLatitude");
-        let lng =
-          longitude[0].numerator +
-          longitude[1].numerator / (60 * longitude[1].denominator) +
-          longitude[2].numerator / (3600 * longitude[2].denominator);
+        let lng, lat;
+        if (longitude) {
+          lng =
+            longitude[0].numerator +
+            longitude[1].numerator / (60 * longitude[1].denominator) +
+            longitude[2].numerator / (3600 * longitude[2].denominator);
+        } else {
+          lng = "no data available";
+        }
 
-        let lat =
-          latitude[0].numerator +
-          latitude[1].numerator / (60 * latitude[1].denominator) +
-          latitude[2].numerator / (3600 * latitude[2].denominator);
+        if (latitude) {
+          lat =
+            latitude[0].numerator +
+            latitude[1].numerator / (60 * latitude[1].denominator) +
+            latitude[2].numerator / (3600 * latitude[2].denominator);
+        } else {
+          lat = "no data available";
+        }
 
         let p = document.createElement("p");
         p.innerHTML = " Longitude: " + lng + ", Latitude: " + lat;
