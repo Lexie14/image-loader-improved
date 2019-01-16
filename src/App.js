@@ -2,9 +2,20 @@ import React, { Component } from "react";
 import ImageRender from "./components/imageRender";
 import "./App.css";
 
+const EXIF = require("exif-js");
+
 class App extends Component {
+  constructor(props) {
+    super(props);
+    // this.state = {
+    //   images: []
+    // };
+
+    this.handleImageLoad = this.handleImageLoad.bind(this);
+  }
+
   handleImageLoad(evt) {
-    let files = evt.target.files;
+    var files = evt.target.files;
 
     let li = document.createElement("li");
 
@@ -19,7 +30,9 @@ class App extends Component {
         return function(e) {
           let span = document.createElement("span");
           span.innerHTML = [
-            '<img class="thumb" src="',
+            '<img id="',
+            escape(theFile.name),
+            '"src="',
             e.target.result,
             '" title="',
             escape(theFile.name),
@@ -37,16 +50,45 @@ class App extends Component {
       output.push(
         "<strong>",
         escape(files[0].name),
-        "</strong> - ",
+        "</strong> - Size: ",
         files[0].size,
-        " bytes"
+        " bytes. "
       );
     }
     let p = document.createElement("p");
+    p.id = "img" + files[0].name;
     p.innerHTML = output.join("");
     li.appendChild(p);
     document.getElementById("list").appendChild(li);
+
+    this.getData(files);
+
+    // this.getData(evt.target);
   }
+
+  getData = files => {
+    setTimeout(() => {
+      let img1 = document.getElementById(files[0].name);
+      EXIF.getData(img1, function() {
+        let longitude = EXIF.getTag(this, "GPSLongitude");
+        let latitude = EXIF.getTag(this, "GPSLatitude");
+        let lng =
+          longitude[0].numerator +
+          longitude[1].numerator / (60 * longitude[1].denominator) +
+          longitude[2].numerator / (3600 * longitude[2].denominator);
+
+        let lat =
+          latitude[0].numerator +
+          latitude[1].numerator / (60 * latitude[1].denominator) +
+          latitude[2].numerator / (3600 * latitude[2].denominator);
+
+        let p = document.createElement("p");
+        p.innerHTML = " Longitude: " + lng + ", Latitude: " + lat;
+        document.getElementById("img" + files[0].name).appendChild(p);
+      });
+      console.log(files[0].name);
+    }, 100);
+  };
 
   render() {
     return <ImageRender handleImageLoad={this.handleImageLoad} />;
