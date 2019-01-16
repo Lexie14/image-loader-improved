@@ -18,6 +18,7 @@ class App extends Component {
     var files = evt.target.files;
 
     let li = document.createElement("li");
+    li.id = "li" + files[0].name;
 
     for (let i = 0, f; (f = files[i]); i++) {
       if (!f.type.match("image.*")) {
@@ -58,9 +59,18 @@ class App extends Component {
     let p = document.createElement("p");
     p.id = "img" + files[0].name;
     p.innerHTML = output.join("");
-    li.appendChild(p);
-    document.getElementById("list").appendChild(li);
+    li.insertBefore(p, li.childNodes[1]);
 
+    let btn = document.createElement("button");
+    var btnText = document.createTextNode("Delete");
+    btn.onclick = function() {
+      let liDel = document.getElementById("li" + files[0].name);
+      liDel.parentNode.removeChild(liDel);
+    };
+
+    btn.appendChild(btnText);
+    li.appendChild(btn);
+    document.getElementById("list").appendChild(li);
     this.getData(files);
 
     // this.getData(evt.target);
