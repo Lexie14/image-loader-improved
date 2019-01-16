@@ -5,7 +5,13 @@ class ImageRender extends Component {
   render() {
     return (
       <div className="App">
-        <input type="file" id="files" name="files[]" multiple />
+        <input
+          type="file"
+          id="files"
+          name="files[]"
+          multiple
+          onChange={this.props.handleImageLoad}
+        />
         <output>
           <ul id="list" />
         </output>
