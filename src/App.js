@@ -9,16 +9,18 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      images: []
+      images: [],
+      list: "wow"
     };
 
     this.handleImageLoad = this.handleImageLoad.bind(this);
     this.getData = this.getData.bind(this);
+    // this.deleteImage = this.deleteImage.bind(this);
   }
 
   handleImageLoad(evt) {
-    console.log(this.state.list);
     var files = evt.target.files;
+    var x = this.state.list;
 
     if (files.length === 0) {
       return;
@@ -48,13 +50,6 @@ class App extends Component {
     p.innerHTML = output.join("");
     li.insertBefore(p, li.childNodes[1]);
 
-    let btn = document.createElement("button");
-    var btnText = document.createTextNode("Delete");
-    btn.onclick = function() {
-      let liDel = document.getElementById("li" + files[0].name);
-      liDel.parentNode.removeChild(liDel);
-    };
-
     for (let i = 0, f; (f = files[i]); i++) {
       let reader = new FileReader();
 
@@ -77,6 +72,27 @@ class App extends Component {
       reader.readAsDataURL(f);
     }
 
+    let btn = document.createElement("button");
+    var btnText = document.createTextNode("Delete");
+
+    // btn.onclick = function(img) {
+    //   console.log(img);
+    //   let liDel = document.getElementById("li" + files[0].name);
+    //   liDel.parentNode.removeChild(liDel);
+    //   // setTimeout(function(img) {
+    //   //   // this.setState({ list: "Hello World!" });
+    //   //   console.log(img);
+    //   // }, 100);
+    // };
+
+    btn.onclick = () => {
+      let liDel = document.getElementById("li" + files[0].name);
+      liDel.parentNode.removeChild(liDel);
+      setTimeout(() => {
+        this.dosome(files);
+      }, 100);
+    };
+
     btn.appendChild(btnText);
     li.appendChild(btn);
     document.getElementById("list").appendChild(li);
@@ -84,6 +100,19 @@ class App extends Component {
 
     // this.getData(evt.target);
   }
+
+  dosome = files => {
+    var imagesList = this.state.images;
+    var newImagesList = [];
+
+    for (let i = 0; i < imagesList.length; i++) {
+      if (imagesList[i].id !== files[0].name) {
+        newImagesList.push(imagesList[i]);
+      }
+    }
+    this.setState({ images: newImagesList });
+    console.log(newImagesList);
+  };
 
   getData = files => {
     let lng, lat;
