@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import ImageRender from "./components/imageRender";
+import GoogleMap from "./map";
 import "./App.css";
 
 const EXIF = require("exif-js");
@@ -7,15 +8,21 @@ const EXIF = require("exif-js");
 class App extends Component {
   constructor(props) {
     super(props);
-    // this.state = {
-    //   images: []
-    // };
+    this.state = {
+      images: []
+    };
 
     this.handleImageLoad = this.handleImageLoad.bind(this);
+    this.getData = this.getData.bind(this);
   }
 
   handleImageLoad(evt) {
+    console.log(this.state.list);
     var files = evt.target.files;
+
+    if (files.length === 0) {
+      return;
+    }
 
     if (files[0].size > 1000000) {
       alert("The max size of an image must be less than 1Mb!");
@@ -79,12 +86,15 @@ class App extends Component {
   }
 
   getData = files => {
+    let lng, lat;
     setTimeout(() => {
       let img1 = document.getElementById(files[0].name);
       EXIF.getData(img1, function() {
-        var longitude = EXIF.getTag(this, "GPSLongitude");
+        // console.log(this.state.list + "hey");
+
+        let longitude = EXIF.getTag(this, "GPSLongitude");
         let latitude = EXIF.getTag(this, "GPSLatitude");
-        let lng, lat;
+
         if (longitude) {
           lng =
             longitude[0].numerator +
@@ -106,13 +116,21 @@ class App extends Component {
         let p = document.createElement("p");
         p.innerHTML = " Longitude: " + lng + ", Latitude: " + lat;
         document.getElementById("img" + files[0].name).appendChild(p);
+        return lat, lng;
       });
-      console.log(files[0].name);
+      let newImage = { id: files[0].name, location: { lat: lat, lng: lng } };
+      this.setState({ images: this.state.images.concat(newImage) });
+      console.log(this.state.images);
     }, 100);
   };
 
   render() {
-    return <ImageRender handleImageLoad={this.handleImageLoad} />;
+    return (
+      <div className="App">
+        <ImageRender handleImageLoad={this.handleImageLoad} />
+        <GoogleMap google={window.google} images={this.state.images} />
+      </div>
+    );
   }
 }
 
