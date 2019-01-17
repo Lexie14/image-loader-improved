@@ -78,6 +78,7 @@ button {
   text-transform: uppercase;
   letter-spacing: 2px;
   font-weight: bolder;
+  cursor: pointer;
 }
 
 span img {
