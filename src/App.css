@@ -46,6 +46,12 @@ input {
   padding: 13px 0 0 90px;
   margin: 30px 0;
   font-size: 16px;
+  cursor: pointer;
+}
+
+input:hover {
+  background: #333333;
+  color: white;
 }
 
 .output {
