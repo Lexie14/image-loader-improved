@@ -18,4 +18,7 @@ The App allows to upload images from the user's device via File API. App's funct
 ### Code Dependencies
 The project was built with the [google-maps-react] using data via the [Exif.js] and [Google Maps API]. Icons are taken from the [FontAwesome] via react-icons library.
 
+### Warning
+The App has been tested on MAC OS only.
+
 ![Screenshot](image-loader.jpg)
