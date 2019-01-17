@@ -19,3 +19,8 @@ p {
 .gMap {
   border: 2px solid red;
 }
+
+button {
+  display: block;
+  margin: 10px auto;
+}

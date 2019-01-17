@@ -20,11 +20,18 @@ class App extends Component {
 
   handleImageLoad(evt) {
     var files = evt.target.files;
-    var x = this.state.list;
 
     if (files.length === 0) {
       return;
     }
+
+    for (let i = 0; i < this.state.images.length; i++) {
+      if (files[0].name === this.state.images[i].id) {
+        return;
+      }
+    }
+
+    var x = this.state.list;
 
     if (files[0].size > 1000000) {
       alert("The max size of an image must be less than 1Mb!");
