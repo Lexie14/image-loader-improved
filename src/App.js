@@ -88,7 +88,7 @@ class App extends Component {
     // Create a button to delete both:
     // image's record in the DOM and in the app's state
     let btn = document.createElement("button");
-    var btnText = document.createTextNode("Delete");
+    let btnText = document.createTextNode("Delete");
 
     btn.onclick = event => {
       this.deleteImage(event);
@@ -102,13 +102,13 @@ class App extends Component {
 
   // Delete image from the DOM and in the app's state
   deleteImage = event => {
-    var liId = event.path[1].id;
-    var id = liId.substring(2);
+    let liId = event.path[1].id;
+    let id = liId.substring(2);
     let liDel = document.getElementById("li" + id);
     liDel.parentNode.removeChild(liDel);
     console.log(id);
-    var imagesList = this.state.images;
-    var newImagesList = [];
+    let imagesList = this.state.images;
+    let newImagesList = [];
 
     for (let i = 0; i < imagesList.length; i++) {
       if (imagesList[i].id !== id) {
@@ -116,7 +116,6 @@ class App extends Component {
       }
     }
     this.setState({ images: newImagesList });
-    console.log(this.state.images);
     document.getElementById("files").value = "";
   };
 
