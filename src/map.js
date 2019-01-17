@@ -2,13 +2,13 @@ import React, { Component } from "react";
 import { Map, Marker } from "google-maps-react";
 
 class GoogleMap extends Component {
-  state = {};
   render() {
-    // const style = { margin: "100px" };
+    // create map's borders based on the markers displayed
     let places = this.props.images.map(image => image.location);
     let bounds = new this.props.google.maps.LatLngBounds();
 
     for (var i = 0; i < places.length; i++) {
+      // check if lat/lng are valid values
       if (places[i].lat !== "no data available") {
         bounds.extend(places[i]);
       }
@@ -18,7 +18,6 @@ class GoogleMap extends Component {
       <div>
         <div className="mapContainer">
           <Map
-            // style={style}
             google={this.props.google}
             zoom={11}
             initialCenter={{ lat: 52.2566371, lng: 20.984122345 }}

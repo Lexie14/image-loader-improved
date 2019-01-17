@@ -1,9 +1,6 @@
 import React, { Component } from "react";
 
-const image = require("../image.jpg");
-
 class ImageRender extends Component {
-  state = {};
   render() {
     return (
       <div className="imageLoader">

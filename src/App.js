@@ -17,26 +17,30 @@ class App extends Component {
     this.getExifData = this.getExifData.bind(this);
   }
 
+  //
   handleImageLoad(evt) {
     var files = evt.target.files;
 
+    // Handle error when there is no image upload
+    // after input-onchange event fired
     if (files.length === 0) {
       return;
     }
 
+    // Stop function execution if the image which is going
+    // to be uploaded is already on the list
     for (let i = 0; i < this.state.images.length; i++) {
       if (files[0].name === this.state.images[i].id) {
         return;
       }
     }
-
-    var x = this.state.list;
-
+    // Stop function exection if an image's size
+    // exceeds 1Mb
     if (files[0].size > 1000000) {
       alert("The max size of an image must be less than 1Mb!");
       return;
     }
-
+    // Get image's name and size on upload event
     let li = document.createElement("li");
     li.id = "li" + files[0].name;
 
@@ -57,6 +61,7 @@ class App extends Component {
     p.innerHTML = output.join("");
     li.insertBefore(p, li.childNodes[1]);
 
+    // Get image's thumbnail via FileReader
     for (let i = 0, f; (f = files[i]); i++) {
       let reader = new FileReader();
 
@@ -79,6 +84,8 @@ class App extends Component {
       reader.readAsDataURL(f);
     }
 
+    // Create a button to delete both:
+    // image's record in the DOM and in the app's state
     let btn = document.createElement("button");
     var btnText = document.createTextNode("Delete");
 
@@ -87,7 +94,7 @@ class App extends Component {
       liDel.parentNode.removeChild(liDel);
       setTimeout(() => {
         this.deleteImage(files);
-      }, 100);
+      }, 0);
     };
 
     btn.appendChild(btnText);
@@ -96,6 +103,7 @@ class App extends Component {
     this.getExifData(files);
   }
 
+  // Delete image from the app's state
   deleteImage = files => {
     var imagesList = this.state.images;
     var newImagesList = [];
@@ -106,11 +114,15 @@ class App extends Component {
       }
     }
     this.setState({ images: newImagesList });
-    console.log(newImagesList);
   };
 
+  // Get lat and lng data data via Exif
   getExifData = files => {
     let lng, lat;
+
+    // setTimeout is used to make sure that an image
+    // has been already uploaded and the info from it
+    // can be extracted by Exif
     setTimeout(() => {
       let img1 = document.getElementById(files[0].name);
       EXIF.getData(img1, function() {
@@ -140,9 +152,11 @@ class App extends Component {
         document.getElementById("img" + files[0].name).appendChild(p);
         return lat, lng;
       });
+
+      // Image's lng and lat are added to the app's state
+      // in order to use it for GoogleMaps markers location
       let newImage = { id: files[0].name, location: { lat: lat, lng: lng } };
       this.setState({ images: this.state.images.concat(newImage) });
-      console.log(this.state.images);
     }, 100);
   };
 
