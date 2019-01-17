@@ -90,12 +90,8 @@ class App extends Component {
     let btn = document.createElement("button");
     var btnText = document.createTextNode("Delete");
 
-    btn.onclick = () => {
-      let liDel = document.getElementById("li" + files[0].name);
-      liDel.parentNode.removeChild(liDel);
-      setTimeout(() => {
-        this.deleteImage(files);
-      }, 0);
+    btn.onclick = event => {
+      this.deleteImage(event);
     };
 
     btn.appendChild(btnText);
@@ -104,17 +100,24 @@ class App extends Component {
     this.getExifData(files);
   }
 
-  // Delete image from the app's state
-  deleteImage = files => {
+  // Delete image from the DOM and in the app's state
+  deleteImage = event => {
+    var liId = event.path[1].id;
+    var id = liId.substring(2);
+    let liDel = document.getElementById("li" + id);
+    liDel.parentNode.removeChild(liDel);
+    console.log(id);
     var imagesList = this.state.images;
     var newImagesList = [];
 
     for (let i = 0; i < imagesList.length; i++) {
-      if (imagesList[i].id !== files[0].name) {
+      if (imagesList[i].id !== id) {
         newImagesList.push(imagesList[i]);
       }
     }
     this.setState({ images: newImagesList });
+    console.log(this.state.images);
+    document.getElementById("files").value = "";
   };
 
   // Get lat and lng data data via Exif
