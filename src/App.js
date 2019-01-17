@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import ImageRender from "./components/imageRender";
-import GoogleMap from "./map";
+import GoogleMap from "./components/map";
 import "./App.css";
+import { FaCopyright } from "react-icons/fa";
 
 const EXIF = require("exif-js");
 
@@ -168,7 +169,14 @@ class App extends Component {
           <ImageRender handleImageLoad={this.handleImageLoad} />
           <GoogleMap google={window.google} images={this.state.images} />
         </div>
-        <footer>made by Lexie for Be Poland Think, Solve & Execute</footer>
+        <footer>
+          <p>
+            <span className="copyright">
+              <FaCopyright />
+            </span>
+            2019 made by Lexie for Be Poland Think, Solve & Execute
+          </p>
+        </footer>
       </div>
     );
   }
