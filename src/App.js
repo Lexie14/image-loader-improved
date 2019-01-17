@@ -14,8 +14,7 @@ class App extends Component {
     };
 
     this.handleImageLoad = this.handleImageLoad.bind(this);
-    this.getData = this.getData.bind(this);
-    // this.deleteImage = this.deleteImage.bind(this);
+    this.getExifData = this.getExifData.bind(this);
   }
 
   handleImageLoad(evt) {
@@ -54,6 +53,7 @@ class App extends Component {
     }
     let p = document.createElement("p");
     p.id = "img" + files[0].name;
+    p.className = "imageInfo";
     p.innerHTML = output.join("");
     li.insertBefore(p, li.childNodes[1]);
 
@@ -82,33 +82,21 @@ class App extends Component {
     let btn = document.createElement("button");
     var btnText = document.createTextNode("Delete");
 
-    // btn.onclick = function(img) {
-    //   console.log(img);
-    //   let liDel = document.getElementById("li" + files[0].name);
-    //   liDel.parentNode.removeChild(liDel);
-    //   // setTimeout(function(img) {
-    //   //   // this.setState({ list: "Hello World!" });
-    //   //   console.log(img);
-    //   // }, 100);
-    // };
-
     btn.onclick = () => {
       let liDel = document.getElementById("li" + files[0].name);
       liDel.parentNode.removeChild(liDel);
       setTimeout(() => {
-        this.dosome(files);
+        this.deleteImage(files);
       }, 100);
     };
 
     btn.appendChild(btnText);
     li.appendChild(btn);
     document.getElementById("list").appendChild(li);
-    this.getData(files);
-
-    // this.getData(evt.target);
+    this.getExifData(files);
   }
 
-  dosome = files => {
+  deleteImage = files => {
     var imagesList = this.state.images;
     var newImagesList = [];
 
@@ -121,13 +109,11 @@ class App extends Component {
     console.log(newImagesList);
   };
 
-  getData = files => {
+  getExifData = files => {
     let lng, lat;
     setTimeout(() => {
       let img1 = document.getElementById(files[0].name);
       EXIF.getData(img1, function() {
-        // console.log(this.state.list + "hey");
-
         let longitude = EXIF.getTag(this, "GPSLongitude");
         let latitude = EXIF.getTag(this, "GPSLatitude");
 
@@ -163,8 +149,12 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <ImageRender handleImageLoad={this.handleImageLoad} />
-        <GoogleMap google={window.google} images={this.state.images} />
+        <header>Image Uploader</header>
+        <div className="content">
+          <ImageRender handleImageLoad={this.handleImageLoad} />
+          <GoogleMap google={window.google} images={this.state.images} />
+        </div>
+        <footer>made by Lexie for Be Poland Think, Solve & Execute</footer>
       </div>
     );
   }

@@ -4,7 +4,7 @@ import { Map, Marker } from "google-maps-react";
 class GoogleMap extends Component {
   state = {};
   render() {
-    const style = { width: "70%", height: "70%" };
+    // const style = { margin: "100px" };
     let places = this.props.images.map(image => image.location);
     let bounds = new this.props.google.maps.LatLngBounds();
 
@@ -16,10 +16,9 @@ class GoogleMap extends Component {
 
     return (
       <div>
-        <p>hi-hi-hi</p>
-        <div className="gMap">
+        <div className="mapContainer">
           <Map
-            style={style}
+            // style={style}
             google={this.props.google}
             zoom={11}
             initialCenter={{ lat: 52.2566371, lng: 20.984122345 }}
