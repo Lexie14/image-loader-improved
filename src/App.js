@@ -13,15 +13,10 @@ class App extends Component {
       images: [],
       list: "wow"
     };
-
-    this.handleImageLoad = this.handleImageLoad.bind(this);
-    this.getExifData = this.getExifData.bind(this);
-    this.some = this.some.bind(this);
-    this.getImageInfo = this.getImageInfo.bind(this);
   }
 
   //
-  handleImageLoad(evt) {
+  handleImageLoad = evt => {
     var files = evt.target.files;
 
     // Handle error when there is no image upload
@@ -37,6 +32,7 @@ class App extends Component {
         return;
       }
     }
+
     // Stop function exection if an image's size
     // exceeds 1Mb
     if (files[0].size > 1000000) {
@@ -59,72 +55,35 @@ class App extends Component {
     // li.appendChild(btn);
     // document.getElementById("list").appendChild(li);
     // this.getExifData(files);
-  }
+  };
 
   // Get image's name and size on upload event
   getImageInfo = files => {
     console.log(files);
-    let li = document.createElement("li");
-    li.id = "li" + files[0].name;
-
-    let output = [];
-
     for (let i = 0; i < files.length; i++) {
-      output.push(
-        "<strong>",
-        escape(files[0].name),
-        "</strong> - Size: ",
-        files[0].size,
-        " bytes. "
-      );
-    }
-    let p = document.createElement("p");
-    p.id = "img" + files[0].name;
-    p.className = "imageInfo";
-    p.innerHTML = output.join("");
-    li.insertBefore(p, li.childNodes[1]);
-    document.getElementById("list").appendChild(li);
+      let li = document.createElement("li");
+      li.innerHTML = `<p className=${files[i].name}>${
+        files[i].name
+      } - <span>Size: ${files[i].size}</span></p>`;
 
-    // Get image's thumbnail via FileReader
-    for (let i = 0, f; (f = files[i]); i++) {
       let reader = new FileReader();
+      reader.onload = event => {
+        console.log(event);
+        let image = document.createElement("img");
+        image.setAttribute("src", `${event.target.result}`);
+        image.id = `${files[i].name}`;
+        li.insertBefore(image, li.childNodes[0]);
+      };
 
-      reader.onload = (theFile => {
-        return e => {
-          let span = document.createElement("span");
-          span.innerHTML = [
-            '<img id="',
-            escape(theFile.name),
-            '"src="',
-            e.target.result,
-            '" title="',
-            escape(theFile.name),
-            '"/>'
-          ].join("");
-          li.insertBefore(span, li.childNodes[0]);
-          let readyImage = document.getElementById(files[0].name);
-          console.log(readyImage);
-          readyImage.onload = () => {
-            console.log("hey");
-            this.getExifData(files);
-          };
-          // setTimeout(() => {
-          //   this.getExifData(files);
-          // }, 100);
-        };
-      })(f);
+      reader.readAsDataURL(files[i]);
 
-      reader.readAsDataURL(f);
-
-      // readyImage.onload = files => {
-      //   let readyImage = document.getElementById(files[0].name);
-      //   this.getExifData(files);
-      // };
+      let list = document.getElementById("list");
+      list.appendChild(li);
+      // this.getExifData();
+      // setTimeout(() => {
+      //   this.getExifData();
+      // }, 100);
     }
-
-    // setTimeout(() => {
-    //   this.getExifData(files);
-    // }, 100);
   };
 
   some() {
