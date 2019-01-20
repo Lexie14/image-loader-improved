@@ -7,12 +7,12 @@ class GoogleMap extends Component {
     let places = this.props.images.map(image => image.location);
     let bounds = new this.props.google.maps.LatLngBounds();
 
-    for (var i = 0; i < places.length; i++) {
-      // check if lat/lng are valid values
-      if (places[i].lat !== "no data available") {
-        bounds.extend(places[i]);
-      }
-    }
+    // for (var i = 0; i < places.length; i++) {
+    //   // check if lat/lng are valid values
+    //   if (places[i].lat !== "no data available") {
+    //     bounds.extend(places[i]);
+    //   }
+    // }
 
     return (
       <div>

@@ -16,6 +16,8 @@ class App extends Component {
 
     this.handleImageLoad = this.handleImageLoad.bind(this);
     this.getExifData = this.getExifData.bind(this);
+    this.some = this.some.bind(this);
+    this.getImageInfo = this.getImageInfo.bind(this);
   }
 
   //
@@ -41,7 +43,27 @@ class App extends Component {
       alert("The max size of an image must be less than 1Mb!");
       return;
     }
-    // Get image's name and size on upload event
+
+    this.getImageInfo(files);
+
+    // Create a button to delete both:
+    // image's record in the DOM and in the app's state
+    // let btn = document.createElement("button");
+    // let btnText = document.createTextNode("Delete");
+
+    // btn.onclick = event => {
+    //   this.deleteImage(event);
+    // };
+
+    // btn.appendChild(btnText);
+    // li.appendChild(btn);
+    // document.getElementById("list").appendChild(li);
+    // this.getExifData(files);
+  }
+
+  // Get image's name and size on upload event
+  getImageInfo = files => {
+    console.log(files);
     let li = document.createElement("li");
     li.id = "li" + files[0].name;
 
@@ -61,13 +83,14 @@ class App extends Component {
     p.className = "imageInfo";
     p.innerHTML = output.join("");
     li.insertBefore(p, li.childNodes[1]);
+    document.getElementById("list").appendChild(li);
 
     // Get image's thumbnail via FileReader
     for (let i = 0, f; (f = files[i]); i++) {
       let reader = new FileReader();
 
-      reader.onload = (function(theFile) {
-        return function(e) {
+      reader.onload = (theFile => {
+        return e => {
           let span = document.createElement("span");
           span.innerHTML = [
             '<img id="',
@@ -79,27 +102,34 @@ class App extends Component {
             '"/>'
           ].join("");
           li.insertBefore(span, li.childNodes[0]);
+          let readyImage = document.getElementById(files[0].name);
+          console.log(readyImage);
+          readyImage.onload = () => {
+            console.log("hey");
+            this.getExifData(files);
+          };
+          // setTimeout(() => {
+          //   this.getExifData(files);
+          // }, 100);
         };
       })(f);
 
       reader.readAsDataURL(f);
+
+      // readyImage.onload = files => {
+      //   let readyImage = document.getElementById(files[0].name);
+      //   this.getExifData(files);
+      // };
     }
 
-    // Create a button to delete both:
-    // image's record in the DOM and in the app's state
-    let btn = document.createElement("button");
-    let btnText = document.createTextNode("Delete");
+    // setTimeout(() => {
+    //   this.getExifData(files);
+    // }, 100);
+  };
 
-    btn.onclick = event => {
-      this.deleteImage(event);
-    };
-
-    btn.appendChild(btnText);
-    li.appendChild(btn);
-    document.getElementById("list").appendChild(li);
-    this.getExifData(files);
+  some() {
+    console.log("hey");
   }
-
   // Delete image from the DOM and in the app's state
   deleteImage = event => {
     let liId = event.path[1].id;
@@ -126,41 +156,41 @@ class App extends Component {
     // setTimeout is used to make sure that an image
     // has been already uploaded and the info from it
     // can be extracted by Exif
-    setTimeout(() => {
-      let img1 = document.getElementById(files[0].name);
-      EXIF.getData(img1, function() {
-        let longitude = EXIF.getTag(this, "GPSLongitude");
-        let latitude = EXIF.getTag(this, "GPSLatitude");
 
-        if (longitude) {
-          lng =
-            longitude[0].numerator +
-            longitude[1].numerator / (60 * longitude[1].denominator) +
-            longitude[2].numerator / (3600 * longitude[2].denominator);
-        } else {
-          lng = "no data available";
-        }
+    let img1 = document.getElementById(files[0].name);
+    EXIF.getData(img1, function() {
+      let longitude = EXIF.getTag(this, "GPSLongitude");
+      let latitude = EXIF.getTag(this, "GPSLatitude");
 
-        if (latitude) {
-          lat =
-            latitude[0].numerator +
-            latitude[1].numerator / (60 * latitude[1].denominator) +
-            latitude[2].numerator / (3600 * latitude[2].denominator);
-        } else {
-          lat = "no data available";
-        }
+      if (longitude) {
+        lng =
+          longitude[0].numerator +
+          longitude[1].numerator / (60 * longitude[1].denominator) +
+          longitude[2].numerator / (3600 * longitude[2].denominator);
+      } else {
+        lng = "no data available";
+      }
 
-        let p = document.createElement("p");
-        p.innerHTML = " Longitude: " + lng + ", Latitude: " + lat;
-        document.getElementById("img" + files[0].name).appendChild(p);
-        return lat, lng;
-      });
+      if (latitude) {
+        lat =
+          latitude[0].numerator +
+          latitude[1].numerator / (60 * latitude[1].denominator) +
+          latitude[2].numerator / (3600 * latitude[2].denominator);
+      } else {
+        lat = "no data available";
+      }
 
-      // Image's lng and lat are added to the app's state
-      // in order to use it for GoogleMaps markers location
-      let newImage = { id: files[0].name, location: { lat: lat, lng: lng } };
-      this.setState({ images: this.state.images.concat(newImage) });
-    }, 100);
+      let p = document.createElement("p");
+      p.innerHTML = " Longitude: " + lng + ", Latitude: " + lat;
+      document.getElementById("img" + files[0].name).appendChild(p);
+      return lat, lng;
+    });
+    console.log(lat, lng);
+
+    // Image's lng and lat are added to the app's state
+    // in order to use it for GoogleMaps markers location
+    let newImage = { id: files[0].name, location: { lat: lat, lng: lng } };
+    this.setState({ images: this.state.images.concat(newImage) });
   };
 
   render() {
