@@ -14,7 +14,6 @@ class App extends Component {
       list: "wow"
     };
   }
-
   //
   handleImageLoad = evt => {
     var files = evt.target.files;
@@ -59,36 +58,32 @@ class App extends Component {
 
   // Get image's name and size on upload event
   getImageInfo = files => {
-    console.log(files);
     for (let i = 0; i < files.length; i++) {
       let li = document.createElement("li");
-      li.innerHTML = `<p className=${files[i].name}>${
-        files[i].name
-      } - <span>Size: ${files[i].size}</span></p>`;
+      li.innerHTML = `<p id=${files[i].name}>${files[i].name} - <span>Size: ${
+        files[i].size
+      }</span></p>`;
 
       let reader = new FileReader();
+      let image;
       reader.onload = event => {
-        console.log(event);
-        let image = document.createElement("img");
+        image = document.createElement("img");
         image.setAttribute("src", `${event.target.result}`);
-        image.id = `${files[i].name}`;
+        image.className = `${files[i].name}`;
         li.insertBefore(image, li.childNodes[0]);
+
+        image.onload = () => {
+          this.getExifData(files, i, image, li);
+        };
       };
 
       reader.readAsDataURL(files[i]);
 
       let list = document.getElementById("list");
       list.appendChild(li);
-      // this.getExifData();
-      // setTimeout(() => {
-      //   this.getExifData();
-      // }, 100);
     }
   };
 
-  some() {
-    console.log("hey");
-  }
   // Delete image from the DOM and in the app's state
   deleteImage = event => {
     let liId = event.path[1].id;
@@ -109,48 +104,38 @@ class App extends Component {
   };
 
   // Get lat and lng data data via Exif
-  getExifData = files => {
-    let lng, lat;
+  getExifData(files, i, image, li) {
+    let location = [];
 
-    // setTimeout is used to make sure that an image
-    // has been already uploaded and the info from it
-    // can be extracted by Exif
+    EXIF.getData(image, () => {
+      let longitude = EXIF.getTag(image, "GPSLongitude");
+      let latitude = EXIF.getTag(image, "GPSLatitude");
+      location.push(longitude, latitude);
 
-    let img1 = document.getElementById(files[0].name);
-    EXIF.getData(img1, function() {
-      let longitude = EXIF.getTag(this, "GPSLongitude");
-      let latitude = EXIF.getTag(this, "GPSLatitude");
-
-      if (longitude) {
-        lng =
-          longitude[0].numerator +
-          longitude[1].numerator / (60 * longitude[1].denominator) +
-          longitude[2].numerator / (3600 * longitude[2].denominator);
-      } else {
-        lng = "no data available";
+      for (let i = 0; i < location.length; i++) {
+        if (location[i]) {
+          location[i] =
+            location[i][0].numerator +
+            location[i][1].numerator / (60 * location[i][1].denominator) +
+            location[i][2].numerator / (3600 * location[i][2].denominator);
+        } else {
+          location[i] = "no data  available";
+        }
       }
-
-      if (latitude) {
-        lat =
-          latitude[0].numerator +
-          latitude[1].numerator / (60 * latitude[1].denominator) +
-          latitude[2].numerator / (3600 * latitude[2].denominator);
-      } else {
-        lat = "no data available";
-      }
-
-      let p = document.createElement("p");
-      p.innerHTML = " Longitude: " + lng + ", Latitude: " + lat;
-      document.getElementById("img" + files[0].name).appendChild(p);
-      return lat, lng;
     });
-    console.log(lat, lng);
 
-    // Image's lng and lat are added to the app's state
-    // in order to use it for GoogleMaps markers location
-    let newImage = { id: files[0].name, location: { lat: lat, lng: lng } };
-    this.setState({ images: this.state.images.concat(newImage) });
-  };
+    let locationInfo = document.createElement("p");
+    locationInfo.innerText = `Location: Longitude - ${location[0]},
+    Latitude - ${location[1]}`;
+    let toAppend = document.getElementById(files[i].name);
+    toAppend.appendChild(locationInfo);
+  }
+
+  // Image's lng and lat are added to the app's state
+  // in order to use it for GoogleMaps markers location
+  // let newImage = { id: files[0].name, location: { lat: lat, lng: lng } };
+  // this.setState({ images: this.state.images.concat(newImage) });
+  // };
 
   render() {
     return (
