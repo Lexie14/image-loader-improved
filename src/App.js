@@ -10,11 +10,11 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      images: [],
-      list: "wow"
+      images: []
     };
   }
-  //
+
+  // Sequence of actions on image upload event
   handleImageLoad = evt => {
     var files = evt.target.files;
 
@@ -40,36 +40,24 @@ class App extends Component {
     }
 
     this.getImageInfo(files);
-
-    // Create a button to delete both:
-    // image's record in the DOM and in the app's state
-    // let btn = document.createElement("button");
-    // let btnText = document.createTextNode("Delete");
-
-    // btn.onclick = event => {
-    //   this.deleteImage(event);
-    // };
-
-    // btn.appendChild(btnText);
-    // li.appendChild(btn);
-    // document.getElementById("list").appendChild(li);
-    // this.getExifData(files);
   };
 
-  // Get image's name and size on upload event
+  // Get image's name, size and thumbnail
   getImageInfo = files => {
+    // Get images' name and size
     for (let i = 0; i < files.length; i++) {
       let li = document.createElement("li");
-      li.innerHTML = `<p id=${files[i].name}>${files[i].name} - <span>Size: ${
+      li.id = "li" + files[i].name;
+      li.innerHTML = `<p id = ${files[i].name}>${files[i].name} - <span>Size: ${
         files[i].size
       }</span></p>`;
 
+      // Get image's thumbnail
       let reader = new FileReader();
       let image;
       reader.onload = event => {
         image = document.createElement("img");
         image.setAttribute("src", `${event.target.result}`);
-        image.className = `${files[i].name}`;
         li.insertBefore(image, li.childNodes[0]);
 
         image.onload = () => {
@@ -79,28 +67,22 @@ class App extends Component {
 
       reader.readAsDataURL(files[i]);
 
+      // Create Delete button
+      let btn = document.createElement("button");
+      btn.id = "btn" + files[i].name;
+      let btnText = document.createTextNode("Delete");
+      let app = this;
+
+      btn.onclick = function() {
+        let liState = this.id.substring(3);
+        app.deleteImage(liState);
+      };
+
+      btn.appendChild(btnText);
+      li.appendChild(btn);
       let list = document.getElementById("list");
       list.appendChild(li);
     }
-  };
-
-  // Delete image from the DOM and in the app's state
-  deleteImage = event => {
-    let liId = event.path[1].id;
-    let id = liId.substring(2);
-    let liDel = document.getElementById("li" + id);
-    liDel.parentNode.removeChild(liDel);
-    console.log(id);
-    let imagesList = this.state.images;
-    let newImagesList = [];
-
-    for (let i = 0; i < imagesList.length; i++) {
-      if (imagesList[i].id !== id) {
-        newImagesList.push(imagesList[i]);
-      }
-    }
-    this.setState({ images: newImagesList });
-    document.getElementById("files").value = "";
   };
 
   // Get lat and lng data data via Exif
@@ -108,9 +90,9 @@ class App extends Component {
     let location = [];
 
     EXIF.getData(image, () => {
-      let longitude = EXIF.getTag(image, "GPSLongitude");
       let latitude = EXIF.getTag(image, "GPSLatitude");
-      location.push(longitude, latitude);
+      let longitude = EXIF.getTag(image, "GPSLongitude");
+      location.push(latitude, longitude);
 
       for (let i = 0; i < location.length; i++) {
         if (location[i]) {
@@ -125,17 +107,47 @@ class App extends Component {
     });
 
     let locationInfo = document.createElement("p");
-    locationInfo.innerText = `Location: Longitude - ${location[0]},
-    Latitude - ${location[1]}`;
+    locationInfo.innerText = `Location: Latitude - ${location[0]},
+    Longitude - ${location[1]}`;
     let toAppend = document.getElementById(files[i].name);
     toAppend.appendChild(locationInfo);
+
+    // Image's id, lng and lat are added to the app's state
+    // in order to use it for the Delete button and
+    // GoogleMaps markers location
+    let newImage = {
+      id: files[i].name,
+      location: { lat: location[0], lng: location[1] }
+    };
+    this.setState({ images: this.state.images.concat(newImage) });
   }
 
-  // Image's lng and lat are added to the app's state
-  // in order to use it for GoogleMaps markers location
-  // let newImage = { id: files[0].name, location: { lat: lat, lng: lng } };
-  // this.setState({ images: this.state.images.concat(newImage) });
-  // };
+  // Delete image's record in the DOM and in the app's state
+  deleteImage = liState => {
+    // setTimeout is used to make sure the function will be
+    // based on the latest updated state (imagesList)
+    setTimeout(() => {
+      // Delete image from the images list in the App's state
+      let imagesList = this.state.images;
+      let newImagesList = [];
+
+      for (let i = 0; i < imagesList.length; i++) {
+        if (imagesList[i].id !== liState) {
+          newImagesList.push(imagesList[i]);
+        }
+      }
+
+      this.setState({
+        images: newImagesList
+      });
+
+      // Delete image from the images list in the App's DOM
+      let liList = "li" + liState;
+      let liToDelete = document.getElementById(liList);
+      liToDelete.parentNode.removeChild(liToDelete);
+      document.getElementById("files").value = "";
+    }, 100);
+  };
 
   render() {
     return (
