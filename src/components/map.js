@@ -9,7 +9,7 @@ class GoogleMap extends Component {
 
     for (var i = 0; i < places.length; i++) {
       // check if lat/lng are valid values
-      if (places[i].lat !== "no data available") {
+      if (!isNaN(places[i].lat)) {
         bounds.extend(places[i]);
       }
     }

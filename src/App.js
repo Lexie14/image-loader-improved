@@ -48,9 +48,9 @@ class App extends Component {
     for (let i = 0; i < files.length; i++) {
       let li = document.createElement("li");
       li.id = "li" + files[i].name;
-      li.innerHTML = `<p id = ${files[i].name}>${files[i].name} - <span>Size: ${
-        files[i].size
-      }</span></p>`;
+      li.innerHTML = `<p id = ${files[i].name}><strong>${
+        files[i].name
+      }</strong> - <span>Size: ${files[i].size}</span></p>`;
 
       // Get image's thumbnail
       let reader = new FileReader();
