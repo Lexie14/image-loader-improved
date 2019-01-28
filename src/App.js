@@ -48,7 +48,7 @@ class App extends Component {
     for (let i = 0; i < files.length; i++) {
       let li = document.createElement("li");
       li.id = "li" + files[i].name;
-      li.innerHTML = `<p id = ${files[i].name}><strong>${
+      li.innerHTML = `<p id = ${files[i].name} class="imageInfo"><strong>${
         files[i].name
       }</strong> - <span>Size: ${files[i].size}</span></p>`;
 
@@ -107,7 +107,9 @@ class App extends Component {
     });
 
     let locationInfo = document.createElement("p");
-    locationInfo.innerText = `Location: Latitude - ${location[0]},
+    locationInfo.innerHTML = `<strong>Location:</strong> Latitude - ${
+      location[0]
+    },
     Longitude - ${location[1]}`;
     let toAppend = document.getElementById(files[i].name);
     toAppend.appendChild(locationInfo);

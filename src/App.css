@@ -70,7 +70,8 @@ li {
 }
 
 .imageInfo {
-  margin: 0 30px 0 20px;
+  margin: 0 30px 0 30px;
+  /* justify-self: center; */
 }
 
 button {
